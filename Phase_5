@@ -1,0 +1,25 @@
+// Main function that is triggered by a user request (e.g., via a web server)
+FUNCTION Main_Orchestrator(user_query, source_document):
+    // Initialize the knowledge base (could be done once on server startup)
+    knowledge_base = Setup_KnowledgeBase(source_document)
+
+    // Phase 1
+    retrieved_chunks = Query_KnowledgeBase(knowledge_base, user_query)
+
+    // Phase 2
+    ai_plan = Generate_AI_VideoPlan(user_query, retrieved_chunks)
+
+    // Phase 3
+    formatted_plan = Format_VideoPlan(ai_plan)
+    IF formatted_plan is an Error THEN RETURN formatted_plan
+
+    // Phase 4
+    final_video_path = Generate_And_Render_Video(formatted_plan)
+    IF final_video_path is an Error THEN RETURN final_video_path
+
+    // Phase 6
+    public_url = Store_And_Retrieve_Asset(final_video_path)
+
+    // Return the final result to the user
+    RETURN public_url
+END FUNCTION

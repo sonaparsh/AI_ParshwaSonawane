@@ -1,0 +1,23 @@
+FUNCTION Generate_AI_VideoPlan(user_query, relevant_text_chunks):
+    // Combine the retrieved chunks into a single string to provide context
+    context_string = Join(relevant_text_chunks, separator="\n---\n")
+
+    // Create a detailed prompt instructing the AI what to do
+    master_prompt = CreateMasterPrompt(
+        role="You are an expert educational content creator...",
+        context=context_string,
+        user_request=user_query,
+        output_format="Respond ONLY with a valid JSON object..."
+    )
+    
+    // Send the prompt to a Large Language Model (LLM)
+    llm_api = Initialize_LLM_Client()
+    response = llm_api.Request(prompt=master_prompt)
+
+    // Ensure the response is a valid JSON and return it
+    IF IsValidJSON(response.content) THEN
+        RETURN ParseJSON(response.content)
+    ELSE
+        RETURN Error("AI failed to generate a valid plan.")
+    END IF
+END FUNCTION

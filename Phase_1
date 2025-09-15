@@ -1,0 +1,29 @@
+// --- SETUP SCRIPT (Run once, offline) ---
+PROCEDURE Ingest_Document(source_document_path, database_storage_path):
+    raw_text = ReadFile(source_document_path)
+    text_chunks = SplitTextIntoChunks(raw_text)
+    embedding_model = Load_Text_Embedding_Model()
+
+    // Process in batches for significant speedup
+    embeddings_list = embedding_model.GenerateEmbeddingsInBatches(text_chunks)
+
+    vector_database = Initialize_VectorDatabase(storage_path=database_storage_path)
+    vector_database.Add(documents=text_chunks, embeddings=embeddings_list)
+    vector_database.Save() // Persist the database to disk
+END PROCEDURE
+
+// --- LIVE SERVER USAGE ---
+FUNCTION Load_Existing_KnowledgeBase(database_storage_path):
+    IF DatabaseExists(database_storage_path) THEN
+        RETURN Connect_To_VectorDatabase(storage_path=database_storage_path)
+    ELSE
+        RETURN Error("Knowledge base not found. Run ingestion script first.")
+    END IF
+END FUNCTION    
+
+FUNCTION Query_KnowledgeBase(database, query_string):
+    embedding_model = Load_Text_Embedding_Model()
+    query_vector = embedding_model.GenerateEmbedding(query_string)
+    search_results = database.FindSimilar(query_vector, number_of_results=3)
+    RETURN search_results.documents
+END FUNCTION

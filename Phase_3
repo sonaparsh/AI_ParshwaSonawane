@@ -1,0 +1,13 @@
+FUNCTION Format_VideoPlan(video_plan_json):
+    // This function can be as simple or complex as needed.
+    // For a simple case, we are just validating the structure.
+    // In a more complex system, this might restructure the JSON
+    // or generate additional metadata before code generation.
+
+    IF video_plan_json.concept_title AND video_plan_json.slides THEN
+        Log("JSON plan is valid and formatted correctly.")
+        RETURN video_plan_json
+    ELSE
+        RETURN Error("Invalid video plan structure.")
+    END IF
+END FUNCTION
